@@ -22,3 +22,5 @@ A simple Python GUI application that converts any image into a pencil sketch dra
 ## Installation
 
 1. Clone the repository
+2. Install the packages
+3. Run the application
