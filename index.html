@@ -3,130 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pencil Sketch & Image Processing Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <title>Pencil Sketch Studio — Manroop Singh</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #090d16;
-            --surface: rgba(18, 24, 38, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --accent: #f43f5e;
+            --bg: #090a0f;
+            --subtle-bg: #0d0f17;
+            --card-bg: #121520;
+            --card-hover: #161a28;
+            --border-color: #1e2333;
+            --border-hover: #2d344d;
+            --text-title: #f8fafc;
+            --text-body: #94a3b8;
+            --text-subtle: #64748b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
+            --danger: #f43f5e;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
         body {
             min-height: 100vh;
-            background: radial-gradient(circle at 50% 0%, #290814 0%, var(--bg) 75%);
-            color: var(--text-main);
-            padding: 32px 16px;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent),
+                radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.05), transparent 40%);
+            color: var(--text-body);
+            line-height: 1.5;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 24px 16px 64px;
         }
-        .container { width: 100%; max-width: 960px; }
-        .nav-back { color: #fb7185; text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-bottom: 24px; display: inline-block; }
-        .hero {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
-            backdrop-filter: blur(20px); padding: 36px; position: relative; overflow: hidden; margin-bottom: 24px;
+        .container {
+            width: 100%;
+            max-width: 980px;
         }
-        .hero::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #f43f5e, #a855f7);
+        header.top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
         }
-        .badge {
-            display: inline-block; padding: 6px 14px; border-radius: 9999px;
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-            background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3);
-            margin-bottom: 12px;
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-title);
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            transition: opacity 0.2s;
         }
-        h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; }
-        p.subtitle { color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 20px; }
-        
-        .studio-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
+        .brand-link:hover { opacity: 0.8; }
+        .brand-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 800;
         }
-        @media (max-width: 720px) { .studio-grid { grid-template-columns: 1fr; } }
-        .canvas-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-            backdrop-filter: blur(16px); padding: 20px; display: flex; flex-direction: column; align-items: center;
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .canvas-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: #cbd5e1; }
-        .preview-box {
-            width: 100%; aspect-ratio: 1/1; background: rgba(0,0,0,0.5); border-radius: 14px;
-            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
-            overflow: hidden; position: relative;
+        .nav-btn {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-subtle);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
-        canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .controls-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-            padding: 24px; backdrop-filter: blur(16px);
+        .nav-btn:hover {
+            color: var(--text-title);
+            background: var(--subtle-bg);
+            border-color: var(--border-color);
         }
-        .controls-flex {
-            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+        .app-header {
+            margin-bottom: 32px;
         }
-        .file-upload {
-            position: relative; overflow: hidden; display: inline-block;
+        .app-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 600;
         }
-        .file-upload input[type=file] {
-            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+        .app-category::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
         }
-        .btn {
-            padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none;
-            transition: all 0.2s; font-size: 0.92rem;
+        h1.app-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-title);
+            margin-bottom: 8px;
+            line-height: 1.2;
         }
-        .btn-upload { background: #f43f5e; color: #fff; }
-        .btn-upload:hover { background: #e11d48; }
-        .btn-action { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border); }
-        .btn-action:hover { background: rgba(255,255,255,0.12); }
-        .slider-group {
-            display: flex; align-items: center; gap: 12px; margin-top: 16px;
+        p.app-summary {
+            font-size: 0.98rem;
+            color: var(--text-body);
+            max-width: 680px;
+            line-height: 1.6;
         }
-        .slider-group label { font-size: 0.85rem; color: #94a3b8; font-weight: 600; min-width: 120px; }
-        .slider-group input { flex: 1; accent-color: #f43f5e; }
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-title);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-badge {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-subtle);
+            background: var(--subtle-bg);
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+        .btn-secondary {
+            background: var(--subtle-bg);
+            color: var(--text-title);
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-secondary:hover {
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            border-radius: var(--radius-sm);
+        }
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-subtle);
+        }
+        .footer a {
+            color: var(--text-body);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer a:hover { color: var(--text-title); }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="https://bhogals-profile.vercel.app/" class="nav-back">← Return to Manroop's Portfolio</a>
+        <header class="top-nav">
+            <a href="https://bhogals-profile.vercel.app/" class="brand-link">
+                <div class="brand-avatar">M</div>
+                <span>Manroop Singh Portfolio</span>
+            </a>
+            <div class="nav-actions">
+                <a href="https://github.com/MANROOP-SINGH-01" target="_blank" class="nav-btn">GitHub</a>
+                <a href="https://bhogals-profile.vercel.app/" class="nav-btn">All Projects</a>
+            </div>
+        </header>
 
-        <div class="hero">
-            <div class="badge">Computer Vision • Dodge Blending</div>
-            <h1>Pencil Sketch Image Converter</h1>
-            <p class="subtitle">
-                Algorithmic image transformation tool replicating OpenCV's Gaussian Blur and Dodge-Blending technique to turn any photograph into a fine pencil sketch directly in the browser.
+        <div class="app-header">
+            <div class="app-category">Computer Vision • Convolutional Filter</div>
+            <h1 class="app-title">Pencil Sketch Studio</h1>
+            <p class="app-summary">
+                Converts digital photos into pencil drawings using grayscale transformation, inversion, Gaussian blur, and dodge blending.
             </p>
         </div>
 
-        <div class="studio-grid">
-            <div class="canvas-card">
-                <h3>Original Image</h3>
-                <div class="preview-box">
-                    <canvas id="origCanvas"></canvas>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="panel" style="text-align: center;">
+                <div class="panel-header">
+                    <span class="panel-title">Source Image</span>
+                    <span class="panel-badge">Original</span>
+                </div>
+                <div style="width: 100%; aspect-ratio: 1/1; background: #08090e; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center;">
+                    <canvas id="origCanvas" style="max-width: 100%; max-height: 100%;"></canvas>
                 </div>
             </div>
-            <div class="canvas-card">
-                <h3>Pencil Sketch Output</h3>
-                <div class="preview-box">
-                    <canvas id="sketchCanvas"></canvas>
+
+            <div class="panel" style="text-align: center;">
+                <div class="panel-header">
+                    <span class="panel-title">Processed Render</span>
+                    <span class="panel-badge">Pencil Sketch</span>
+                </div>
+                <div style="width: 100%; aspect-ratio: 1/1; background: #08090e; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center;">
+                    <canvas id="sketchCanvas" style="max-width: 100%; max-height: 100%;"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="controls-card">
-            <div class="controls-flex">
-                <div class="file-upload">
-                    <button class="btn btn-upload">📁 Upload Any Photo</button>
-                    <input type="file" id="imageInput" accept="image/*">
-                </div>
-                <button class="btn btn-action" onclick="downloadSketch()">💾 Download Sketch</button>
-                <button class="btn btn-action" onclick="loadSample()">🔄 Load Sample</button>
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Processing Controls</span>
+                <span class="panel-badge">Adjustable Kernel</span>
             </div>
-            <div class="slider-group">
-                <label>Pencil Softness:</label>
-                <input type="range" id="blurRadius" min="3" max="41" step="2" value="21" oninput="applyTransform()">
-                <span id="radiusVal" style="font-family: 'JetBrains Mono'; font-size: 0.9rem; color: #fb7185;">21px</span>
+            <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                <label class="btn-primary" style="position: relative; overflow: hidden; cursor: pointer;">
+                    Upload Photograph
+                    <input type="file" id="imageInput" accept="image/*" style="position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                </label>
+                <button class="btn-secondary" onclick="downloadSketch()">Download Sketch</button>
+                <button class="btn-secondary" onclick="loadSample()">Reload Sample</button>
+                <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                    <span style="font-size: 0.82rem; color: var(--text-title); font-weight: 600;">Blur Radius:</span>
+                    <input type="range" id="blurRadius" min="3" max="35" step="2" value="19" oninput="applyTransform()" style="accent-color: var(--primary);">
+                    <span id="radiusVal" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-subtle); width: 36px;">19px</span>
+                </div>
             </div>
         </div>
+
+        <footer class="footer">
+            <span>Built by Manroop Singh • Deployed on Vercel</span>
+            <a href="https://github.com/MANROOP-SINGH-01/pencil_sketch_converter" target="_blank">View Source Code →</a>
+        </footer>
     </div>
 
     <script>
@@ -139,21 +318,21 @@
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(event) {
+            const r = new FileReader();
+            r.onload = function(evt) {
                 const img = new Image();
                 img.onload = function() {
                     currentImage = img;
                     applyTransform();
                 };
-                img.src = event.target.result;
+                img.src = evt.target.result;
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(file);
         });
 
         function applyTransform() {
             if (!currentImage) return;
-            const maxDim = 400;
+            const maxDim = 380;
             let w = currentImage.width, h = currentImage.height;
             if (w > h) {
                 if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -163,10 +342,8 @@
 
             origCanvas.width = w; origCanvas.height = h;
             sketchCanvas.width = w; sketchCanvas.height = h;
-
             origCtx.drawImage(currentImage, 0, 0, w, h);
 
-            // Step 1: Grayscale & Inversion
             const imgData = origCtx.getImageData(0, 0, w, h);
             const d = imgData.data;
             const gray = new Uint8ClampedArray(w * h);
@@ -179,20 +356,16 @@
                 inverted[idx] = 255 - g;
             }
 
-            // Step 2: Gaussian/Box Blur approximation on inverted image
             const radius = parseInt(document.getElementById('blurRadius').value);
             document.getElementById('radiusVal').textContent = radius + 'px';
-            const blurred = boxBlur(inverted, w, h, Math.floor(radius / 2));
+            const blurred = fastBlur(inverted, w, h, Math.floor(radius / 2));
 
-            // Step 3: Dodge Blend: sketch = (gray * 256) / (255 - blurred)
             const outData = sketchCtx.createImageData(w, h);
             const out = outData.data;
 
             for (let i = 0; i < gray.length; i++) {
-                const g = gray[i];
-                const b = blurred[i];
-                const denom = 255 - b;
-                let val = (denom === 0) ? 255 : Math.min(255, Math.floor((g * 256) / denom));
+                const denom = 255 - blurred[i];
+                let val = (denom === 0) ? 255 : Math.min(255, Math.floor((gray[i] * 256) / denom));
                 const outIdx = i * 4;
                 out[outIdx] = val;
                 out[outIdx+1] = val;
@@ -203,7 +376,7 @@
             sketchCtx.putImageData(outData, 0, 0);
         }
 
-        function boxBlur(data, w, h, r) {
+        function fastBlur(data, w, h, r) {
             const out = new Uint8ClampedArray(w * h);
             for (let y = 0; y < h; y++) {
                 for (let x = 0; x < w; x++) {
@@ -224,20 +397,20 @@
         }
 
         function downloadSketch() {
-            const link = document.createElement('a');
-            link.download = 'pencil-sketch.png';
-            link.href = sketchCanvas.toDataURL();
-            link.click();
+            const a = document.createElement('a');
+            a.download = 'pencil-sketch.png';
+            a.href = sketchCanvas.toDataURL();
+            a.click();
         }
 
         function loadSample() {
-            const sample = new Image();
-            sample.crossOrigin = 'Anonymous';
-            sample.onload = function() {
-                currentImage = sample;
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function() {
+                currentImage = img;
                 applyTransform();
             };
-            sample.src = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80';
+            img.src = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80';
         }
         window.onload = loadSample;
     </script>
