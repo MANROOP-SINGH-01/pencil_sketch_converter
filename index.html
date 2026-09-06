@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencil Sketch Image Converter | Manroop Singh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: rgba(18, 24, 38, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #171d34 0%, var(--bg) 75%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .wrapper {
+            width: 100%;
+            max-width: 840px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .back-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #818cf8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .back-nav:hover { color: #a5b4fc; }
+        .header-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 36px 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .header-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.65;
+            margin-bottom: 24px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: #ffffff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .demo-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .demo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .demo-title span { color: #818cf8; }
+        .mono-box {
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        footer {
+            margin-top: 32px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        footer a { color: #818cf8; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <a href="https://bhogals-profile.vercel.app/" class="back-nav">
+            ← Return to Manroop's Portfolio
+        </a>
+
+        <div class="header-card">
+            <div class="badge">Image Processing / OpenCV</div>
+            <h1>Pencil Sketch Image Converter</h1>
+            <p class="desc">Algorithmic image transformation tool that converts real-world color photos into fine pencil sketch drawings using Gaussian blurring and dodge blending.</p>
+            <div class="actions">
+                <a href="https://github.com/MANROOP-SINGH-01/pencil_sketch_converter" target="_blank" class="btn btn-primary">
+                    View on GitHub
+                </a>
+                <a href="https://bhogals-profile.vercel.app/" class="btn btn-secondary">
+                    View All Projects
+                </a>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-title">
+                <span>⚡</span> Architecture & Repository Components
+            </div>
+            <div class="mono-box">
+Project Repository: MANROOP-SINGH-01/pencil_sketch_converter
+Deployment Target: Vercel Production
+Status: Production Ready & Verified
+Key Artifacts:
+  • pencil_sketch.py
+            </div>
+            <div class="file-list">
+                <span class="file-tag">📄 pencil_sketch.py</span>
+            </div>
+        </div>
+
+        <footer>
+            Crafted with precision • <a href="https://bhogals-profile.vercel.app/">Manroop Singh Portfolio</a>
+        </footer>
+    </div>
+</body>
+</html>
