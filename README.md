@@ -1,6 +1,6 @@
 # Pencil Sketch Converter
 
-![Sketch Screenshot](https://github.com/adityashelke04/pencil_sketch_converter/blob/b325c1baf5794e085ea98a801850ed9254e88443/screenshot/Screenshot%202025-10-22%20133653.png)
+![Sketch Screenshot](https://github.com/MANROOP-SINGH-01/pencil_sketch_converter/blob/b325c1baf5794e085ea98a801850ed9254e88443/screenshot/Screenshot%202025-10-22%20133653.png)
 
 A simple Python GUI application that converts any image into a pencil sketch drawing using OpenCV and Tkinter.
 
