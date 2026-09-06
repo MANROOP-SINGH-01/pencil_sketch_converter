@@ -3,220 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pencil Sketch Image Converter | Manroop Singh</title>
+    <title>Pencil Sketch & Image Processing Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #090d16;
-            --card-bg: rgba(18, 24, 38, 0.7);
+            --surface: rgba(18, 24, 38, 0.7);
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.25);
+            --accent: #f43f5e;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
         body {
             min-height: 100vh;
-            background: radial-gradient(circle at 50% 0%, #171d34 0%, var(--bg) 75%);
+            background: radial-gradient(circle at 50% 0%, #290814 0%, var(--bg) 75%);
             color: var(--text-main);
+            padding: 32px 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
         }
-        .wrapper {
-            width: 100%;
-            max-width: 840px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
+        .container { width: 100%; max-width: 960px; }
+        .nav-back { color: #fb7185; text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-bottom: 24px; display: inline-block; }
+        .hero {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+            backdrop-filter: blur(20px); padding: 36px; position: relative; overflow: hidden; margin-bottom: 24px;
         }
-        .back-nav {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: #818cf8;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .back-nav:hover { color: #a5b4fc; }
-        .header-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 36px 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        .header-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #f43f5e, #a855f7);
         }
         .badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            margin-bottom: 16px;
-        }
-        h1 {
-            font-size: 2.3rem;
-            font-weight: 900;
-            letter-spacing: -0.02em;
+            display: inline-block; padding: 6px 14px; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3);
             margin-bottom: 12px;
-            background: linear-gradient(135deg, #ffffff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
-        p.desc {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.65;
-            margin-bottom: 24px;
+        h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; }
+        p.subtitle { color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 20px; }
+        
+        .studio-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
         }
-        .actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+        @media (max-width: 720px) { .studio-grid { grid-template-columns: 1fr; } }
+        .canvas-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+            backdrop-filter: blur(16px); padding: 20px; display: flex; flex-direction: column; align-items: center;
+        }
+        .canvas-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: #cbd5e1; }
+        .preview-box {
+            width: 100%; aspect-ratio: 1/1; background: rgba(0,0,0,0.5); border-radius: 14px;
+            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+        canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .controls-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+            padding: 24px; backdrop-filter: blur(16px);
+        }
+        .controls-flex {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+        }
+        .file-upload {
+            position: relative; overflow: hidden; display: inline-block;
+        }
+        .file-upload input[type=file] {
+            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
         }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
+            padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.2s; font-size: 0.92rem;
         }
-        .btn-primary {
-            background: #6366f1;
-            color: #ffffff;
-            border: none;
+        .btn-upload { background: #f43f5e; color: #fff; }
+        .btn-upload:hover { background: #e11d48; }
+        .btn-action { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border); }
+        .btn-action:hover { background: rgba(255,255,255,0.12); }
+        .slider-group {
+            display: flex; align-items: center; gap: 12px; margin-top: 16px;
         }
-        .btn-primary:hover {
-            background: #4f46e5;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: #e2e8f0;
-            border: 1px solid var(--border);
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-        .demo-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .demo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .demo-title span { color: #818cf8; }
-        .mono-box {
-            background: rgba(10, 14, 23, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
-            padding: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.88rem;
-            color: #cbd5e1;
-            line-height: 1.6;
-            overflow-x: auto;
-        }
-        .file-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        .file-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        footer {
-            margin-top: 32px;
-            text-align: center;
-            color: #64748b;
-            font-size: 0.85rem;
-        }
-        footer a { color: #818cf8; text-decoration: none; }
+        .slider-group label { font-size: 0.85rem; color: #94a3b8; font-weight: 600; min-width: 120px; }
+        .slider-group input { flex: 1; accent-color: #f43f5e; }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <a href="https://bhogals-profile.vercel.app/" class="back-nav">
-            ← Return to Manroop's Portfolio
-        </a>
+    <div class="container">
+        <a href="https://bhogals-profile.vercel.app/" class="nav-back">← Return to Manroop's Portfolio</a>
 
-        <div class="header-card">
-            <div class="badge">Image Processing / OpenCV</div>
+        <div class="hero">
+            <div class="badge">Computer Vision • Dodge Blending</div>
             <h1>Pencil Sketch Image Converter</h1>
-            <p class="desc">Algorithmic image transformation tool that converts real-world color photos into fine pencil sketch drawings using Gaussian blurring and dodge blending.</p>
-            <div class="actions">
-                <a href="https://github.com/MANROOP-SINGH-01/pencil_sketch_converter" target="_blank" class="btn btn-primary">
-                    View on GitHub
-                </a>
-                <a href="https://bhogals-profile.vercel.app/" class="btn btn-secondary">
-                    View All Projects
-                </a>
+            <p class="subtitle">
+                Algorithmic image transformation tool replicating OpenCV's Gaussian Blur and Dodge-Blending technique to turn any photograph into a fine pencil sketch directly in the browser.
+            </p>
+        </div>
+
+        <div class="studio-grid">
+            <div class="canvas-card">
+                <h3>Original Image</h3>
+                <div class="preview-box">
+                    <canvas id="origCanvas"></canvas>
+                </div>
+            </div>
+            <div class="canvas-card">
+                <h3>Pencil Sketch Output</h3>
+                <div class="preview-box">
+                    <canvas id="sketchCanvas"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="demo-card">
-            <div class="demo-title">
-                <span>⚡</span> Architecture & Repository Components
+        <div class="controls-card">
+            <div class="controls-flex">
+                <div class="file-upload">
+                    <button class="btn btn-upload">📁 Upload Any Photo</button>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <button class="btn btn-action" onclick="downloadSketch()">💾 Download Sketch</button>
+                <button class="btn btn-action" onclick="loadSample()">🔄 Load Sample</button>
             </div>
-            <div class="mono-box">
-Project Repository: MANROOP-SINGH-01/pencil_sketch_converter
-Deployment Target: Vercel Production
-Status: Production Ready & Verified
-Key Artifacts:
-  • pencil_sketch.py
-            </div>
-            <div class="file-list">
-                <span class="file-tag">📄 pencil_sketch.py</span>
+            <div class="slider-group">
+                <label>Pencil Softness:</label>
+                <input type="range" id="blurRadius" min="3" max="41" step="2" value="21" oninput="applyTransform()">
+                <span id="radiusVal" style="font-family: 'JetBrains Mono'; font-size: 0.9rem; color: #fb7185;">21px</span>
             </div>
         </div>
-
-        <footer>
-            Crafted with precision • <a href="https://bhogals-profile.vercel.app/">Manroop Singh Portfolio</a>
-        </footer>
     </div>
+
+    <script>
+        const origCanvas = document.getElementById('origCanvas');
+        const sketchCanvas = document.getElementById('sketchCanvas');
+        const origCtx = origCanvas.getContext('2d');
+        const sketchCtx = sketchCanvas.getContext('2d');
+        let currentImage = null;
+
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    applyTransform();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function applyTransform() {
+            if (!currentImage) return;
+            const maxDim = 400;
+            let w = currentImage.width, h = currentImage.height;
+            if (w > h) {
+                if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            } else {
+                if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+
+            origCanvas.width = w; origCanvas.height = h;
+            sketchCanvas.width = w; sketchCanvas.height = h;
+
+            origCtx.drawImage(currentImage, 0, 0, w, h);
+
+            // Step 1: Grayscale & Inversion
+            const imgData = origCtx.getImageData(0, 0, w, h);
+            const d = imgData.data;
+            const gray = new Uint8ClampedArray(w * h);
+            const inverted = new Uint8ClampedArray(w * h);
+
+            for (let i = 0; i < d.length; i += 4) {
+                const g = Math.round(0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2]);
+                const idx = i / 4;
+                gray[idx] = g;
+                inverted[idx] = 255 - g;
+            }
+
+            // Step 2: Gaussian/Box Blur approximation on inverted image
+            const radius = parseInt(document.getElementById('blurRadius').value);
+            document.getElementById('radiusVal').textContent = radius + 'px';
+            const blurred = boxBlur(inverted, w, h, Math.floor(radius / 2));
+
+            // Step 3: Dodge Blend: sketch = (gray * 256) / (255 - blurred)
+            const outData = sketchCtx.createImageData(w, h);
+            const out = outData.data;
+
+            for (let i = 0; i < gray.length; i++) {
+                const g = gray[i];
+                const b = blurred[i];
+                const denom = 255 - b;
+                let val = (denom === 0) ? 255 : Math.min(255, Math.floor((g * 256) / denom));
+                const outIdx = i * 4;
+                out[outIdx] = val;
+                out[outIdx+1] = val;
+                out[outIdx+2] = val;
+                out[outIdx+3] = 255;
+            }
+
+            sketchCtx.putImageData(outData, 0, 0);
+        }
+
+        function boxBlur(data, w, h, r) {
+            const out = new Uint8ClampedArray(w * h);
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    let sum = 0, count = 0;
+                    for (let dy = -r; dy <= r; dy += 2) {
+                        for (let dx = -r; dx <= r; dx += 2) {
+                            const nx = x + dx, ny = y + dy;
+                            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                                sum += data[ny * w + nx];
+                                count++;
+                            }
+                        }
+                    }
+                    out[y * w + x] = Math.round(sum / count);
+                }
+            }
+            return out;
+        }
+
+        function downloadSketch() {
+            const link = document.createElement('a');
+            link.download = 'pencil-sketch.png';
+            link.href = sketchCanvas.toDataURL();
+            link.click();
+        }
+
+        function loadSample() {
+            const sample = new Image();
+            sample.crossOrigin = 'Anonymous';
+            sample.onload = function() {
+                currentImage = sample;
+                applyTransform();
+            };
+            sample.src = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80';
+        }
+        window.onload = loadSample;
+    </script>
 </body>
 </html>
